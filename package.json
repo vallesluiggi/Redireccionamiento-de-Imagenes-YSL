@@ -1,5 +1,5 @@
 {
-  "name": "redimensionamiento-de-imagenes-ysl",
+  "name": "images-resized",
   "version": "1.0.0",
   "description": "Una librería Node.js para redimensionar imágenes y almacenarlas localmente o en AWS S3, con soporte para múltiples formatos y manejo robusto de errores.",
   "main": "src/index.js",

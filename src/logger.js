@@ -1,4 +1,4 @@
-// redimensionamiento-de-imagenes-ysl\src\logger.js
+// images-resized\src\logger.js
 const winston = require('winston');
 
 // Definir los niveles de log y sus colores (opcional, pero buena práctica)
@@ -9,7 +9,7 @@ const levels = {
   http: 3,
   verbose: 4,
   debug: 5,
-  silly: 6
+  silly: 6,
 };
 
 // Definir los colores para los niveles (para la consola)
@@ -20,7 +20,7 @@ const colors = {
   http: 'magenta',
   verbose: 'cyan',
   debug: 'blue',
-  silly: 'grey'
+  silly: 'grey',
 };
 
 winston.addColors(colors); // Añadir colores a Winston
@@ -37,7 +37,9 @@ const consoleFormat = winston.format.combine(
   winston.format.colorize({ all: true }), // Colorear todos los niveles
   winston.format.timestamp({ format: 'HH:mm:ss' }),
   winston.format.printf(
-    (info) => `${info.timestamp} ${info.level}: ${info.message}` + (info.stack ? `\n${info.stack}` : '')
+    (info) =>
+      `${info.timestamp} ${info.level}: ${info.message}` +
+      (info.stack ? `\n${info.stack}` : '')
   )
 );
 
@@ -49,11 +51,18 @@ const logger = winston.createLogger({
   level: logLevel, // Nivel de log actual
   transports: [
     new winston.transports.Console({
-      format: consoleFormat
+      format: consoleFormat,
     }),
-    new winston.transports.File({ filename: 'error.log', level: 'error', format: fileFormat }),
-    new winston.transports.File({ filename: 'combined.log', format: fileFormat })
-  ]
+    new winston.transports.File({
+      filename: 'error.log',
+      level: 'error',
+      format: fileFormat,
+    }),
+    new winston.transports.File({
+      filename: 'combined.log',
+      format: fileFormat,
+    }),
+  ],
 });
 
 module.exports = logger;
