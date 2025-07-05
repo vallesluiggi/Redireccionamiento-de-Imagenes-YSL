@@ -1,6 +1,5 @@
 // src/s3-storage.js
 const AWS = require('aws-sdk');
-// !!! CAMBIO AQUÍ !!! Importa desde la carpeta errors/
 const { StorageError } = require('./errors');
 const logger = require('./logger');
 
