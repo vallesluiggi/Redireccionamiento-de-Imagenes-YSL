@@ -1,7 +1,12 @@
 {
-  "name": "redireccionamiento-de-imagenes-ysl",
+  "name": "redimensionamiento-de-imagenes-ysl",
   "version": "1.0.0",
   "description": "Una librería Node.js para redimensionar imágenes y almacenarlas localmente o en AWS S3, con soporte para múltiples formatos y manejo robusto de errores.",
+  "main": "src/index.js",
+  "exports": "./src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "keywords": [
     "imagen",
     "redimensionar",
@@ -12,6 +17,12 @@
     "sharp",
     "yo-soy-lu"
   ],
+  "author": {
+    "name": "Jose Valles",
+    "url": "https://yosoylu.com",
+    "email": "vallesluiggi@gmail.com"
+  },
+  "license": "MIT",
   "homepage": "https://github.com/vallesluiggi/Redireccionamiento-de-Imagenes-YSL#readme",
   "bugs": {
     "url": "https://github.com/vallesluiggi/Redireccionamiento-de-Imagenes-YSL/issues"
@@ -20,20 +31,11 @@
     "type": "git",
     "url": "git+https://github.com/vallesluiggi/Redireccionamiento-de-Imagenes-YSL.git"
   },
-  "license": "MIT",
-  "author": {
-    "name": "Jose Valles",
-    "url": "https://yosoylu.com",
-    "email": "vallesluiggi@gmail.com"
-  },
-  "main": "src/index.js",
-  "exports": "./src/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "dependencies": {
     "aws-sdk": "^2.1692.0",
     "dotenv": "^17.0.1",
-    "sharp": "^0.34.2"
+    "file-type": "^21.0.0",
+    "sharp": "^0.34.2",
+    "winston": "^3.17.0"
   }
 }

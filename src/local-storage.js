@@ -1,115 +1,84 @@
+// src/local-storage.js
 const fs = require('fs').promises;
 const path = require('path');
-const { resizeImage, SIZES, getFileExtensionForFormat } = require('./utils');
-const { StorageError, ImageProcessingError } = require('./errors');
+const { StorageError } = require('./errors');
+const logger = require('./logger');
 
-// Cache para directorios ya creados en esta sesión
-const createdDirectories = new Set();
+async function saveSingleImageLocally(imageBuffer, filename, basePath) {
+  const fullPath = path.join(basePath, filename);
+  const dir = path.dirname(fullPath);
 
-/**
- * Asegura que un directorio exista. Si no existe, lo crea y lo añade al cache.
- * @param {string} dirPath - La ruta del directorio a asegurar.
- * @returns {Promise<void>}
- * @throws {StorageError} Si falla la creación del directorio.
- */
-async function ensureDirectoryExists(dirPath) {
-  if (createdDirectories.has(dirPath)) {
-    return; // Ya sabemos que existe, no es necesario verificar nuevamente
-  }
   try {
-    await fs.mkdir(dirPath, { recursive: true });
-    createdDirectories.add(dirPath); // Añadir al cache para futuras llamadas
+    logger.debug('Creando directorio local recursivamente: %s', dir);
+    await fs.mkdir(dir, { recursive: true });
+    logger.debug('Escribiendo archivo local: %s', fullPath);
+    await fs.writeFile(fullPath, imageBuffer);
+    logger.info('Imagen guardada localmente: %s', fullPath);
+    return fullPath;
   } catch (error) {
+    // Asegurarse de que el error original se pase como 'cause'
+    logger.error(
+      'StorageError: Error al guardar la imagen localmente en %s: %s',
+      fullPath,
+      error.message,
+      { originalError: error }
+    );
     throw new StorageError(
-      `Error al crear o verificar el directorio: '${dirPath}'. ${error.message}`,
+      `Error al guardar la imagen localmente en '${fullPath}': ${error.message}`,
       error
     );
   }
 }
 
 /**
- * Guarda la imagen original y sus versiones redimensionadas localmente.
- * Las imágenes se organizan en:
- * [storagePath]/original_image.jpg
- * [storagePath]/resized/small/original_image-small.jpg
- * [storagePath]/resized/medium/original_image-medium.jpg
- * [storagePath]/resized/large/original_image-large.jpg
- *
- * @param {Buffer} imageBuffer - El buffer de la imagen original.
- * @param {string} originalFilename - El nombre original del archivo (ej. "mi-imagen.jpg").
- * @param {string} storagePath - La ruta base donde se guardarán las imágenes.
- * @param {string} [outputFormat='jpeg'] - El formato de salida deseado para las imágenes redimensionadas.
- * @param {number} [quality] - La calidad de las imágenes redimensionadas (0-100).
+ * Guarda un array de objetos de imagen (original y redimensionadas) en el almacenamiento local.
+ * @param {Array<{buffer: Buffer, filename: string, sizeKey: string}>} imagesToSave - Array de objetos con buffers, nombres de archivo y claves de tamaño.
+ * @param {string} localStoragePath - La ruta base de almacenamiento local.
  * @returns {Promise<object>} Un objeto con las rutas de las imágenes guardadas.
- * @throws {StorageError} Si falla alguna operación de escritura de archivo o creación de directorio.
- * @throws {ImageProcessingError} Si falla el redimensionamiento de alguna imagen.
+ * @throws {StorageError} Si hay un error al guardar los archivos.
  */
-async function saveImageLocally(
-  imageBuffer,
-  originalFilename,
-  storagePath,
-  outputFormat = 'jpeg',
-  quality
-) {
-  const filenameWithoutExt = path.parse(originalFilename).name;
-  const originalFileExtension = path.parse(originalFilename).ext;
-  const outputExt = getFileExtensionForFormat(outputFormat);
-
-  const originalImagePath = path.join(storagePath, originalFilename);
-  const resizeDirPath = path.join(storagePath, 'resized');
+async function saveImageLocally(imagesToSave, localStoragePath) {
+  logger.info(
+    'Iniciando proceso de guardado de imágenes localmente. Base path: %s',
+    localStoragePath
+  );
+  const results = {
+    original: null,
+    resized: {},
+  };
 
   try {
-    // Asegura que las carpetas existan de forma eficiente
-    await ensureDirectoryExists(storagePath);
-    await ensureDirectoryExists(resizeDirPath);
-    for (const sizeKey in SIZES) {
-      await ensureDirectoryExists(path.join(resizeDirPath, sizeKey));
-    }
-
-    // Guarda la imagen original
-    await fs.writeFile(originalImagePath, imageBuffer);
-
-    // Redimensiona y guarda las imágenes en sus carpetas respectivas
-    const resizedImages = {};
-    for (const sizeKey in SIZES) {
-      const resizedBuffer = await resizeImage(
-        imageBuffer,
-        sizeKey,
-        originalFilename,
-        outputFormat,
-        quality
+    for (const img of imagesToSave) {
+      logger.debug(
+        'Guardando imagen local: %s (sizeKey: %s)',
+        img.filename,
+        img.sizeKey
       );
-      const resizedFilename = `${filenameWithoutExt}-${sizeKey}.${outputExt}`;
-      const resizedFilePath = path.join(
-        resizeDirPath,
-        sizeKey,
-        resizedFilename
-      );
-      await fs.writeFile(resizedFilePath, resizedBuffer);
-      resizedImages[sizeKey] = resizedFilePath;
+      if (img.sizeKey === 'original') {
+        results.original = await saveSingleImageLocally(
+          img.buffer,
+          img.filename,
+          localStoragePath
+        );
+      } else {
+        results.resized[img.sizeKey] = await saveSingleImageLocally(
+          img.buffer,
+          img.filename,
+          localStoragePath
+        );
+      }
     }
-
-    return {
-      original: originalImagePath,
-      resized: resizedImages,
-      message: 'Imágenes guardadas localmente con éxito.',
-    };
+    logger.info('Todas las imágenes guardadas localmente.');
+    return results;
   } catch (error) {
-    // Re-lanza nuestros errores personalizados directamente
-    if (
-      error instanceof ImageProcessingError ||
-      error instanceof StorageError
-    ) {
-      throw error;
-    }
-    // Envuelve otros errores inesperados en un StorageError
-    throw new StorageError(
-      `Fallo al guardar imágenes localmente: ${error.message}`,
-      error
+    // saveSingleImageLocally ya lanza StorageError, solo re-lanzamos
+    logger.error(
+      'StorageError: Fallo al procesar el almacenamiento local: %s',
+      error.message,
+      { originalError: error.originalError || error }
     );
+    throw error;
   }
 }
 
-module.exports = {
-  saveImageLocally,
-};
+module.exports = { saveImageLocally };

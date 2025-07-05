@@ -1,11 +1,12 @@
-class StorageError extends Error {
+// src/errors/StorageError.js
+const CustomError = require('./CustomError'); // Importa la clase base
+
+/**
+ * Error relacionado con problemas durante el almacenamiento de la imagen (local o S3).
+ */
+class StorageError extends CustomError {
   constructor(message, originalError = null) {
-    super(message);
-    this.name = 'StorageError';
-    this.originalError = originalError;
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, StorageError);
-    }
+    super(message, originalError, 'ERR_STORAGE');
   }
 }
 
