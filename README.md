@@ -1,4 +1,4 @@
-redimensionamiento-de-imagenes-ysl ✨
+# --- resized-imagen-ysl ✨ ---
 Una potente y flexible librería de Node.js para el redimensionamiento, optimización y almacenamiento de imágenes. Diseñada para ofrecer un control granular sobre el procesamiento de imágenes, soporta almacenamiento local y subida a AWS S3, con gestión de caché inteligente y un robusto manejo de errores. Ideal para aplicaciones que requieren un procesamiento de imágenes eficiente y escalable.
 
 📋 Tabla de Contenidos
@@ -26,12 +26,12 @@ Licencia
 
 Contacto
 
-✨ Características
+### ✨ Características
 Redimensionamiento Flexible: Define múltiples tamaños personalizados para tus imágenes (ej., thumbnail, mobile, desktopHD) o utiliza los predefinidos (small, medium, large).
 
 Optimización de Formato: Soporte para JPEG, PNG, WebP, AVIF, TIFF. Incluye una opción para optimizar el formato de salida automáticamente (ej., convertir a WebP si detecta transparencia para mejor compresión).
 
-Almacenamiento Múltiple:
+## Almacenamiento Múltiple:
 
 Local: Guarda las imágenes procesadas en un directorio especificado de tu sistema de archivos.
 
@@ -53,56 +53,60 @@ Diseño Modular: Estructura de código limpia y modular para facilitar la manten
 
 Procesamiento Paralelo: Redimensionamiento de múltiples tamaños en paralelo para aprovechar al máximo los recursos del sistema y acelerar el procesamiento.
 
-🚀 Instalación
+## 🚀 Instalación
 Para instalar la librería en tu proyecto, asegúrate de tener Node.js (versión 16 o superior recomendada) y npm instalados.
+```bash
+npm install resized-imagen-ysl
+```
 
-npm install redimensionamiento-de-imagenes-ysl
-
-Para desarrollo local o pruebas (si la librería está en una carpeta hermana):
+## Para desarrollo local o pruebas (si la librería está en una carpeta hermana):
 
 En el package.json de tu proyecto de prueba, puedes referenciar la librería localmente. Esto es útil para probar cambios sin necesidad de publicarlos en npm.
-
+```bash
 {
-"name": "mi-proyecto-test",
-"version": "1.0.0",
-"dependencies": {
-"redimensionamiento-de-imagenes-ysl": "file:../redimensionamiento-de-imagenes-ysl",
-"sharp": "^0.33.4",
-"file-type": "^19.0.0",
-"dotenv": "^16.4.5",
-"winston": "^3.13.0",
-"aws-sdk": "^2.1646.0"
+    "name": "mi-proyecto-test",
+    "version": "1.0.0",
+    "dependencies": {
+        "redimensionamiento-de-imagenes-ysl": "file:../resized-imagen-ysl",
+        "sharp": "^0.33.4",
+        "file-type": "^19.0.0",
+        "dotenv": "^16.4.5",
+        "winston": "^3.13.0",
+        "aws-sdk": "^2.1646.0"
+    }
 }
-}
+```
 
 Luego, ejecuta npm install en la raíz de tu proyecto de prueba para instalar todas las dependencias, incluida tu librería local.
 
-⚙️ Configuración
+## ⚙️ Configuración
 La librería se configura principalmente a través de variables de entorno definidas en un archivo .env y un objeto de configuración pasado al constructor de ImageResizer.
 
 Variables de Entorno (.env)
 Crea un archivo .env en la raíz de tu proyecto (donde ejecutas tu aplicación o script que usa la librería).
 
-# --- Configuración de Almacenamiento Local ---
+### --- Configuración de Almacenamiento Local ---
 
-# Habilita o deshabilita el guardado local de imágenes (true/false).
+### Habilita o deshabilita el guardado local de imágenes (true/false).
 
+```bash
 ENABLE_LOCAL_STORAGE=true
+```
+### Ruta absoluta o relativa donde se guardarán las imágenes localmente.
 
-# Ruta absoluta o relativa donde se guardarán las imágenes localmente.
-
-# Ejemplo: ./output/images
-
+### Ejemplo: ./output/images
+```bash
 LOCAL_STORAGE_PATH=./output/images
+```
+## --- Configuración de AWS S3 ---
 
-# --- Configuración de AWS S3 ---
-
-# Habilita o deshabilita la subida de imágenes a AWS S3 (true/false).
-
+### Habilita o deshabilita la subida de imágenes a AWS S3 (true/false).
+```bash
 ENABLE_S3_STORAGE=false
+```
+### Tus credenciales de AWS (requeridas si ENABLE_S3_STORAGE es 'true').
 
-# Tus credenciales de AWS (requeridas si ENABLE_S3_STORAGE es 'true').
-
+```bash
 # AWS_ACCESS_KEY_ID=TU_ACCESS_KEY_ID_DE_AWS
 
 # AWS_SECRET_ACCESS_KEY=TU_SECRET_ACCESS_KEY_DE_AWS
@@ -114,31 +118,32 @@ ENABLE_S3_STORAGE=false
 # El nombre de tu bucket S3.
 
 # AWS_S3_BUCKET_NAME=tu-nombre-de-bucket-s3
+```
 
-# --- Configuración de Caché ---
+## --- Configuración de Caché ---
 
-# Habilita o deshabilita el sistema de caché de imágenes procesadas (true/false).
-
+### Habilita o deshabilita el sistema de caché de imágenes procesadas (true/false).
+```bash
 ENABLE_IMAGE_CACHE=true
 
-# Ruta donde se guardará el caché de imágenes en disco.
+### Ruta donde se guardará el caché de imágenes en disco.
 
 # Ejemplo: ./.image_cache
 
 IMAGE_CACHE_PATH=./.image_cache
+```
+## --- Configuración de Logging ---
 
-# --- Configuración de Logging ---
+### Nivel de log para la consola y archivos.
 
-# Nivel de log para la consola y archivos.
-
-# Opciones: error, warn, info, http, verbose, debug, silly.
-
+### Opciones: error, warn, info, http, verbose, debug, silly.
+```bash
 LOG_LEVEL=debug
-
-💡 Uso
-Inicialización
+```
+## 💡 Uso
+### Inicialización
 Importa la clase ImageResizer y las clases de error para un manejo robusto de excepciones.
-
+```bash
 const ImageResizer = require('redimensionamiento-de-imagenes-ysl');
 const { ConfigurationError, ImageProcessingError, StorageError } = require('redimensionamiento-de-imagenes-ysl');
 
@@ -185,8 +190,8 @@ small: { width: 320, defaultQuality: 80 },
 medium: { width: 640, defaultQuality: 85 },
 large: { width: 1024, defaultQuality: 90 },
 };
-
-Método processImage()
+```
+### Método processImage()
 Este es el método principal para procesar tus imágenes. Acepta un buffer o un stream de imagen, el nombre original y un objeto de opciones para controlar el procesamiento y el almacenamiento.
 
 /\*\*
@@ -222,7 +227,7 @@ Este es el método principal para procesar tus imágenes. Acepta un buffer o un 
 - @throws {StorageError} Si hay un problema durante el almacenamiento de la imagen (local o S3).
   \*/
 
-Ejemplos de Uso
+### Ejemplos de Uso
 const fs = require('fs').promises;
 const path = require('path');
 const ImageResizer = require('redimensionamiento-de-imagenes-ysl');
@@ -320,16 +325,16 @@ const originalFilename = 'example.jpg';
 
 runExamples();
 
-⚠️ Manejo de Errores
+### ⚠️ Manejo de Errores
 La librería lanza errores específicos que puedes capturar y manejar de forma programática para una depuración y control de flujo efectivos. Todos los errores personalizados heredan de una clase base CustomError y tienen las siguientes propiedades:
 
 message: Un mensaje descriptivo del error.
-
+```bash
 code: Un código de error único (ej. ERR_CONFIGURATION, ERR_IMAGE_PROCESSING, ERR_STORAGE).
-
+```
 originalError: Contiene el error subyacente (la causa raíz) si lo hay, útil para la depuración.
 
-Clases de Error:
+### Clases de Error:
 
 ConfigurationError: Indica problemas con la configuración inicial de la librería o las opciones pasadas al método processImage (ej., rutas inválidas, variables de entorno faltantes, opciones de tamaño incorrectas).
 
@@ -337,8 +342,8 @@ ImageProcessingError: Señala fallos durante la lectura, validación del tipo de
 
 StorageError: Ocurre cuando hay problemas al guardar la imagen en el almacenamiento local o al subirla a AWS S3 (ej., permisos insuficientes, problemas de conexión, bucket no encontrado).
 
-Ejemplo de cómo capturar y manejar los errores:
-
+### Ejemplo de cómo capturar y manejar los errores:
+```bash
 const ImageResizer = require('redimensionamiento-de-imagenes-ysl');
 const { ConfigurationError, ImageProcessingError, StorageError } = require('redimensionamiento-de-imagenes-ysl');
 
@@ -364,8 +369,8 @@ console.error(" Causa subyacente:", error.originalError.message);
 throw error;
 }
 }
-
-🤝 Contribución
+```
+### 🤝 Contribución
 ¡Las contribuciones son bienvenidas! Si encuentras un error, tienes una idea para una mejora o quieres añadir una nueva característica, por favor, sigue estos pasos:
 
 Haz un "fork" del repositorio.
@@ -382,7 +387,7 @@ Asegúrate de que el código pase el linter (si está configurado).
 
 Crea un "pull request" detallado explicando tus cambios.
 
-📄 Licencia
+### 📄 Licencia
 Este proyecto está bajo la Licencia MIT.
 
 ¿Por qué la Licencia MIT?
@@ -390,7 +395,7 @@ La Licencia MIT es una licencia de software de código abierto muy permisiva. Es
 
 Puedes encontrar el texto completo de la licencia en el archivo LICENSE en la raíz del repositorio.
 
-MIT License
+### MIT License
 
 Copyright (c) [2025] [Jose Valles]
 
@@ -412,11 +417,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-📧 Contacto
+### 📧 Contacto
 Para cualquier pregunta, sugerencia, colaboración o soporte, no dudes en contactar al creador:
 
 Creador: Jose Valles
-GitHub: https://github.com/vallesluiggi
-Website: https://yosoylu.com
-Correo Electrónico: vallesluiggi@gmail.com
-WhatsApp: +57 302 805 4676
+GitHub: [https://github.com/vallesluiggi](https://github.com/vallesluiggi)
+Website: [https://yosoylu.com](https://yosoylu.com)
+Correo Electrónico: [https://yosoylu.com](mailto:vallesluiggi@gmail.com)
+WhatsApp: [+57 302 805 4676](https://api.whatsapp.com/send?phone=573028054676)
